@@ -1,0 +1,4 @@
+- ble cpnnectivity
+- is2 connectivity/ inmp441 support
+- collect training datafor edge impulse
+- sleep mode
