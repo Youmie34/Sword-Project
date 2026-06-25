@@ -1,4 +1,4 @@
-#include <stdio.h>
+
 #include "esp_err.h"
 #include "esp_log.h"
 #include "sd_spi/sd_spi.h"
@@ -17,6 +17,7 @@ void app_main(void)
     esp_vfs_fat_sdspi_mount(MOUNT_PATH, &sd_host, &slot_config, &sd_mount_config, NULL);
     ESP_LOGI(TAG, "Finished!");
 
-    open_directory();
+    list_files();
+    create_file_on_sd("test.txt");
     list_files();
 }
