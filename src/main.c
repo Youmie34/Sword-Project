@@ -1,19 +1,20 @@
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "driver/gpio.h"
-#include "sdkconfig.h"
+#include <stdio.h>
 
-#define GPIO_LED 19 // port pin of on - board LED
+#include "esp_err.h"
+#include "esp_log.h"
+#include "sd_spi/sd_spi.h"
+#include "sd_mount/sd_mount.h"
 
-void app_main()
+static const char *TAG = "sdcard";
+
+void app_main(void)
 {
-    gpio_set_direction(GPIO_LED, GPIO_MODE_OUTPUT); // set GPIO as output
+    ESP_LOGI(TAG, "Initializing SPI");
 
-    while (1)
-    {
-        gpio_set_level(GPIO_LED, 0);           // set GPIO low , LED goes on
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // wait 100 ms
-        gpio_set_level(GPIO_LED, 1);           // set GPIO high , LED goes off
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // wait 100 ms
-    }
+    spi_bus_initialize(sd_host.slot, &sd_bus_cfg, SDSPI_DEFAULT_DMA);
+    init_sd_cs();
+    // sdspi_host_init();
+
+    esp_vfs_fat_sdspi_mount(MOUNT_PATH, &sd_host, &slot_config, &sd_mount_config, NULL);
+    ESP_LOGI(TAG, "Finished!");
 }
