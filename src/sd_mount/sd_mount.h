@@ -13,6 +13,5 @@ extern DIR *sd_dir;
 
 void open_directory();
 void list_files();
-void create_file_on_sd(const char *filename);
 
 #endif // SD_MOUNT_H
