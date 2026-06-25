@@ -17,3 +17,14 @@ void create_file_on_sd(const char *filename)
 
     printf("Created file: %s\n", full_path);
 }
+
+void create_test_files_on_sd(void)
+{
+    char filename[32];
+
+    for (uint8_t i = 1; i <= SAMPLE_AMOUNT; i++)
+    {
+        snprintf(filename, sizeof(filename), "test_%d.txt", i);
+        create_file_on_sd(filename);
+    }
+}

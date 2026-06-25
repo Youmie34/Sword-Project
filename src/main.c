@@ -17,7 +17,6 @@ void app_main(void)
     esp_vfs_fat_sdspi_mount(MOUNT_PATH, &sd_host, &slot_config, &sd_mount_config, NULL);
     ESP_LOGI(TAG, "Finished!");
 
-    list_files();
-    create_file_on_sd("test.txt");
+    create_test_files_on_sd();
     list_files();
 }
