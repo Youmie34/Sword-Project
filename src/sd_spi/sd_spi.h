@@ -4,6 +4,7 @@
 #include "driver/sdspi_host.h"
 #include "driver/gpio.h"
 #include "sdmmc_cmd.h"
+#include "../common/common.h"
 
 #define SD_MISO 7
 #define SD_MOSI 6

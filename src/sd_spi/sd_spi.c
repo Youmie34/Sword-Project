@@ -1,5 +1,7 @@
 #include "sd_spi.h"
 
+static const char *TAG_SD_SPI = "sd_spi";
+
 sdmmc_host_t sd_host = SDSPI_HOST_DEFAULT();
 sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
 
@@ -16,4 +18,5 @@ void init_sd_cs()
 {
     slot_config.gpio_cs = SD_CS;
     slot_config.host_id = sd_host.slot;
+    ESP_LOGI(TAG_SD_SPI, "SD card CS pin initialized");
 }

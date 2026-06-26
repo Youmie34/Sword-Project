@@ -3,6 +3,7 @@
 
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
+#include "../common/common.h"
 #include <dirent.h>
 #include <stdio.h>
 

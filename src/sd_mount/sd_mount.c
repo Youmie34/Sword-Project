@@ -1,5 +1,6 @@
 #include "sd_mount.h"
 
+static const char *TAG_SD_MOUNT = "sd_mount";
 DIR *sd_dir = NULL;
 
 esp_vfs_fat_mount_config_t sd_mount_config = {
@@ -14,7 +15,7 @@ void open_directory()
 
     if (sd_dir == NULL)
     {
-        printf("Failed to open directory: %s\n", MOUNT_PATH);
+        ESP_LOGE(TAG_SD_MOUNT, "Failed to open directory: %s", MOUNT_PATH);
         return;
     }
 }
@@ -28,7 +29,7 @@ void list_files()
         struct dirent *entry;
         while ((entry = readdir(sd_dir)) != NULL)
         {
-            printf("%s\n", entry->d_name);
+            ESP_LOGI(TAG_SD_MOUNT, "%s", entry->d_name);
         }
         closedir(sd_dir);
     }
