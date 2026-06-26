@@ -6,6 +6,7 @@
 #include "driver/i2s_pdm.h"
 #include "driver/i2s_tdm.h"
 #include "../common/common.h"
+#include "../mic_inmp441/mic_inmp441.h"
 
 #define I2S_SAMPLE_RATE 44100
 #define I2S_BIT_DEPTH 32     // INMP441 liefert oft 24 Bit, aber 32 ist Standard für DMA alignment

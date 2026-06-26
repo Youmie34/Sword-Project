@@ -92,5 +92,6 @@ void input_data()
 
     ESP_LOGI(TAG_I2S_HELPER, "Read %d bytes from I2S", bytes_read);
     // Process the read data as needed
+    analyze_audio(i2s_read_buffer, bytes_read);
     // TODO: write data in file and save on sd card
 }

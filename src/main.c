@@ -20,5 +20,8 @@ void app_main(void)
     // list_files();
 
     i2s_init();
-    input_data();
+    while (1)
+    {
+        input_data();
+    }
 }
