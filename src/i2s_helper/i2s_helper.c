@@ -3,41 +3,17 @@
 static const char *TAG_I2S_HELPER = "i2s_helper";
 static i2s_chan_handle_t i2s_rx_handle = NULL;
 
-// i2s_config_t i2s_config = {
-//     .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX),
-//     .sample_rate = I2S_SAMPLE_RATE,
-//     .bits_per_sample = I2S_BIT_DEPTH,
-//     .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, // Ground the L/R pin on the INMP441.
-//     .communication_format = I2S_COMM_FORMAT_I2S,
-//     .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
-//     .dma_buf_count = I2S_DMA_BUF_COUNT,
-//     .dma_buf_len = I2S_DMA_BUF_LEN,
-//     .use_apll = false,
-//     .tx_desc_auto_clear = false,
-//     .fixed_mclk = 0,
-// };
-
-// i2s_pin_config_t pin_config = {
-//     .mck_io_num = I2S_PIN_NO_CHANGE,
-//     .bck_io_num = I2S_SCK_PIN,
-//     .ws_io_num = I2S_WS_PIN,
-//     .data_out_num = I2S_PIN_NO_CHANGE,
-//     .data_in_num = I2S_DIN_PIN,
-// };
-
-i2s_std_config_t i2s_config = {
-    .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(I2S_SAMPLE_RATE),
-    .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_BIT_DEPTH, I2S_SLOT_MODE_MONO),
+// Reconfigure for PDM (correct for INMP441!)
+i2s_pdm_rx_config_t pdm_rx_cfg = {
+    .clk_cfg = I2S_PDM_RX_CLK_DEFAULT_CONFIG(44100), // Or 48000
+    .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
     .gpio_cfg = {
-        .mclk = NC,
-        .bclk = I2S_SCK_PIN,
-        .ws = I2S_WS_PIN,
-        .dout = NC,
         .din = I2S_DIN_PIN,
+        .clk = I2S_SCK_PIN,
         .invert_flags = {
-            .mclk_inv = 0,
-            .bclk_inv = 0,
-            .ws_inv = 0}}};
+            .clk_inv = true,
+        }},
+};
 
 void i2s_init()
 {
@@ -51,11 +27,11 @@ void i2s_init()
         return;
     }
 
-    // Initialize with std mode configuration
-    ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S std mode...");
-    if (ESP_OK != i2s_channel_init_std_mode(i2s_rx_handle, &i2s_config))
+    // Initialize with PDM mode configuration
+    ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S PDM mode...");
+    if (ESP_OK != i2s_channel_init_pdm_rx_mode(i2s_rx_handle, &pdm_rx_cfg))
     {
-        ESP_LOGE(TAG_I2S_HELPER, "Failed to initialize I2S std mode");
+        ESP_LOGE(TAG_I2S_HELPER, "Failed to initialize I2S PDM mode");
         return;
     }
 
@@ -72,8 +48,8 @@ void i2s_init()
 
 void input_data()
 {
-    // Static buffer to avoid stack overflow - allocated in BSS, not on stack
-    static uint8_t i2s_read_buffer[I2S_DMA_BUF_LEN * 4];
+    // Static buffer for PDM mode (16-bit samples = 2 bytes per sample)
+    static uint8_t i2s_read_buffer[I2S_DMA_BUF_LEN * 2];
     size_t bytes_read = 0;
 
     if (i2s_rx_handle == NULL)
@@ -89,9 +65,7 @@ void input_data()
         ESP_LOGE(TAG_I2S_HELPER, "Failed to read data from I2S: %s", esp_err_to_name(result));
         return;
     }
-
-    ESP_LOGI(TAG_I2S_HELPER, "Read %d bytes from I2S", bytes_read);
-    // Process the read data as needed
+    //  Process the read data as needed
     analyze_audio(i2s_read_buffer, bytes_read);
     // TODO: write data in file and save on sd card
 }
