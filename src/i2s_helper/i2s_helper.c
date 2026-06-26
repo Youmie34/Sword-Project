@@ -2,7 +2,6 @@
 
 static const char *TAG_I2S_HELPER = "i2s_helper";
 static i2s_chan_handle_t i2s_rx_handle = NULL;
-static i2s_chan_handle_t i2s_tx_handle = NULL;
 
 // i2s_config_t i2s_config = {
 //     .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX),
@@ -44,16 +43,27 @@ void i2s_init()
 {
     // Create a new I2S RX channel
     i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
-    if (ESP_OK != i2s_new_channel(&chan_cfg, &i2s_tx_handle, &i2s_rx_handle))
+
+    ESP_LOGI(TAG_I2S_HELPER, "Creating I2S channel...");
+    if (ESP_OK != i2s_new_channel(&chan_cfg, NULL, &i2s_rx_handle))
     {
-        ESP_LOGE(TAG_I2S_HELPER, "Failed to create I2S RX channel");
+        ESP_LOGE(TAG_I2S_HELPER, "Failed to create I2S channel");
+        return;
+    }
+
+    // Initialize with std mode configuration
+    ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S std mode...");
+    if (ESP_OK != i2s_channel_init_std_mode(i2s_rx_handle, &i2s_config))
+    {
+        ESP_LOGE(TAG_I2S_HELPER, "Failed to initialize I2S std mode");
         return;
     }
 
     // Enable the I2S RX channel
+    ESP_LOGI(TAG_I2S_HELPER, "Enabling I2S channel...");
     if (ESP_OK != i2s_channel_enable(i2s_rx_handle))
     {
-        ESP_LOGE(TAG_I2S_HELPER, "Failed to enable I2S RX channel");
+        ESP_LOGE(TAG_I2S_HELPER, "Failed to enable I2S channel");
         return;
     }
 
@@ -62,15 +72,15 @@ void i2s_init()
 
 void input_data()
 {
+    // Static buffer to avoid stack overflow - allocated in BSS, not on stack
+    static uint8_t i2s_read_buffer[I2S_DMA_BUF_LEN * 4];
     size_t bytes_read = 0;
-    uint8_t i2s_read_buffer[I2S_DMA_BUF_LEN * 4]; // Buffer to hold the read data
 
     if (i2s_rx_handle == NULL)
     {
         ESP_LOGE(TAG_I2S_HELPER, "I2S RX channel not initialized");
         return;
     }
-
     // Read data from I2S using the new API
     esp_err_t result = i2s_channel_read(i2s_rx_handle, i2s_read_buffer, sizeof(i2s_read_buffer), &bytes_read, TIMEOUT_MS);
 

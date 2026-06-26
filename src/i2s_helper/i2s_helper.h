@@ -10,7 +10,7 @@
 #define I2S_SAMPLE_RATE 44100
 #define I2S_BIT_DEPTH 32     // INMP441 liefert oft 24 Bit, aber 32 ist Standard für DMA alignment
 #define I2S_DMA_BUF_COUNT 8  // Mehr Puffer für stabilere Aufzeichnung bei höheren Sampling-Rates
-#define I2S_DMA_BUF_LEN 2048 // Anzahl Samples pro Block.
+#define I2S_DMA_BUF_LEN 1024 // Anzahl Samples pro Block.
                              // 1024 * 44100 ≈ 23ms Latenz.
                              // Kann erhöht werden (z.B. 2048 oder 4096) um CPU-Last zu senken,
                              // erhöht aber die Latenz.
