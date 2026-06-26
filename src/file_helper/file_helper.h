@@ -18,5 +18,7 @@ extern TinyWav tw;
 void create_file_on_sd(const char *filename);
 void create_wave_file(const char *filename);
 void create_test_files_on_sd(void);
+void write_wav_data(const char *filename);
+void *create_data(void *data, size_t data_size);
 
 #endif // FILE_HELPER_H
