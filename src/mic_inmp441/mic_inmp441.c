@@ -60,9 +60,9 @@ void record_wav(const char *filename)
     // First check if file exists before creating a new file.
     // check_file_exists(filename);
 
-    FILE *file = create_tinywave_file(filename);
+    create_tinywave_file(filename);
 
-    i2s_record_data(file);
+    i2s_record_data();
 
     ESP_LOGI(TAG_MIC_INMP441, "File written on SDCard");
 }

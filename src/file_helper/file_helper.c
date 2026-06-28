@@ -1,31 +1,17 @@
 #include "file_helper.h"
 
 static const char *TAG_FILE_HELPER = "file_helper";
+TinyWav tw;
 char full_path[30];
 
-TinyWavHeader header = {
-    .ChunkID = {'R', 'I', 'F', 'F'},
-    .ChunkSize = 0,
-    .Format = {'W', 'A', 'V', 'E'},
-    .Subchunk1ID = {'f', 'm', 't', ' '},
-    .Subchunk1Size = 16,
-    .AudioFormat = 1,
-    .NumChannels = NUM_CHANNELS,
-    .SampleRate = SAMPLE_RATE,
-    .ByteRate = BIT_RATE,
-    .BlockAlign = BLOCK_ALIGN,
-    .BitsPerSample = SAMPLING_RATE,
-    .Subchunk2ID = {'d', 'a', 't', 'a'},
-    .Subchunk2Size = 0};
-
-TinyWav tw = {
-    .f = NULL,
-    .h = {{0}},
-    .numChannels = NUM_CHANNELS,
-    .numFramesInHeader = 0,
-    .totalFramesReadWritten = 0,
-    .chanFmt = TW_INTERLEAVED,
-    .sampFmt = TW_INT16};
+// TinyWav tw = {
+//     .f = NULL,
+//     .h = {{0}},
+//     .numChannels = NUM_CHANNELS,
+//     .numFramesInHeader = 0,
+//     .totalFramesReadWritten = 0,
+//     .chanFmt = TW_INTERLEAVED,
+//     .sampFmt = TW_INT16};
 
 void create_file_on_sd(const char *filename)
 {
@@ -56,7 +42,7 @@ void write_wav_data(const char *filename)
     }
 }
 
-FILE *create_tinywave_file(const char *filename)
+void create_tinywave_file(const char *filename)
 {
     snprintf(full_path, sizeof(full_path), "%s/%s", MOUNT_PATH, filename);
 
@@ -68,37 +54,10 @@ FILE *create_tinywave_file(const char *filename)
     if (err != 0)
     {
         ESP_LOGE(TAG_FILE_HELPER, "Failed to open wave file for writing: %s", full_path);
-        return NULL;
+        return;
     }
 
-    tw.h = header; // Set the header for the TinyWav structure
-    tinywav_close_write(&tw);
-
     ESP_LOGI(TAG_FILE_HELPER, "Created wave file: %s", full_path);
-
-    return open_file(full_path);
-}
-
-void create_wave_file(const char *filename)
-{
-    // char full_path[30];
-    // snprintf(full_path, sizeof(full_path), "%s/%s", MOUNT_PATH, filename);
-
-    // FILE *file = fopen(full_path, "wb");
-    // if (file == NULL)
-    // {
-    //     ESP_LOGE(TAG_FILE_HELPER, "Failed to create file: %s", full_path);
-    //     return;
-    // }
-    // const wav_header_t wav_header =
-    //     WAV_HEADER_PCM_DEFAULT(flash_rec_time, 16, CONFIG_EXAMPLE_SAMPLE_RATE, 1);
-
-    // // Write the header to the WAV file
-    // fwrite(&wav_header, sizeof(wav_header), 1, file);
-
-    // i2s_record_data(file);
-
-    // ESP_LOGI(TAG_FILE_HELPER, "Created wave file: %s", full_path);
 }
 
 void create_test_files_on_sd(void)

@@ -18,13 +18,13 @@
 #define I2S_SCK_PIN 1        // BCLK (Serial Clock) -> An INMP441 SCK
 #define I2S_WS_PIN 38        // LRCLK (Word Select) -> An INMP441 L/R (GND oder VCC)
 #define I2S_DIN_PIN 2        // SD (Data Input) -> An INMP441 SD
-#define RECORD_TIME 5        // Sekunden, die aufgenommen werden sollen
+#define RECORD_TIME 3        // Sekunden, die aufgenommen werden sollen
 
 extern i2s_std_config_t i2s_config;
 extern i2s_std_gpio_config_t pin_config;
 
 void i2s_init();
 void i2s_deinit();
-void i2s_record_data(FILE *file);
+void i2s_record_data();
 
 #endif // I2S_HELPER_H
