@@ -26,6 +26,6 @@ void app_main(void)
     periph_init();
 
     create_test_files_on_sd();
-
+    list_files();
     deinit_periph();
 }

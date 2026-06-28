@@ -64,6 +64,5 @@ void record_wav(const char *filename)
 
     i2s_record_data(file);
 
-    fclose(file);
     ESP_LOGI(TAG_MIC_INMP441, "File written on SDCard");
 }

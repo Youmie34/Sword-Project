@@ -63,12 +63,14 @@ void i2s_deinit()
 
 void i2s_record_data(FILE *file)
 {
+
+    ESP_LOGI(TAG_I2S_HELPER, "Starting recording");
     int flash_wr_size = 0;
 
     uint32_t flash_rec_time = BIT_RATE * RECORD_TIME;
 
     size_t bytes_read = 0;
-    uint8_t i2s_readraw_buff[I2S_DMA_BUF_LEN * 4]; // Buffer for raw I2S data
+    static uint8_t i2s_readraw_buff[I2S_DMA_BUF_LEN * 2]; // Buffer for raw I2S data
 
     while (flash_wr_size < flash_rec_time)
     {
@@ -85,5 +87,6 @@ void i2s_record_data(FILE *file)
             break;
         }
     }
+    fclose(file);
     ESP_LOGI(TAG_I2S_HELPER, "Recording done!");
 }
