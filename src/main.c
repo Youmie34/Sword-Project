@@ -4,7 +4,7 @@
 #include "sd_spi/sd_spi.h"
 #include "sd_mount/sd_mount.h"
 
-static const char *TAG_MAIN = "main";
+// static const char *TAG_MAIN = "main";
 
 void app_main(void)
 {
@@ -24,4 +24,5 @@ void app_main(void)
     {
         input_data();
     }
+    i2s_deinit();
 }

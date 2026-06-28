@@ -24,5 +24,6 @@ extern i2s_std_gpio_config_t pin_config;
 
 void i2s_init();
 void input_data();
+void i2s_deinit();
 
 #endif // I2S_HELPER_H

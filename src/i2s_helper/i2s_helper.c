@@ -3,22 +3,10 @@
 static const char *TAG_I2S_HELPER = "i2s_helper";
 static i2s_chan_handle_t i2s_rx_handle = NULL;
 
-// Reconfigure for PDM (correct for INMP441!)
-i2s_pdm_rx_config_t pdm_rx_cfg = {
-    .clk_cfg = I2S_PDM_RX_CLK_DEFAULT_CONFIG(44100), // Or 48000
-    .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
-    .gpio_cfg = {
-        .din = I2S_DIN_PIN,
-        .clk = I2S_SCK_PIN,
-        .invert_flags = {
-            .clk_inv = true,
-        }},
-};
-
 void i2s_init()
 {
     // Create a new I2S RX channel
-    i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
+    i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
 
     ESP_LOGI(TAG_I2S_HELPER, "Creating I2S channel...");
     if (ESP_OK != i2s_new_channel(&chan_cfg, NULL, &i2s_rx_handle))
@@ -26,6 +14,18 @@ void i2s_init()
         ESP_LOGE(TAG_I2S_HELPER, "Failed to create I2S channel");
         return;
     }
+
+    // Reconfigure for PDM (correct for INMP441!)
+    i2s_pdm_rx_config_t pdm_rx_cfg = {
+        .clk_cfg = I2S_PDM_RX_CLK_DEFAULT_CONFIG(44100), // Or 48000
+        .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
+        .gpio_cfg = {
+            .din = I2S_DIN_PIN,
+            .clk = I2S_SCK_PIN,
+            .invert_flags = {
+                .clk_inv = true,
+            }},
+    };
 
     // Initialize with PDM mode configuration
     ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S PDM mode...");
@@ -68,4 +68,19 @@ void input_data()
     //  Process the read data as needed
     analyze_audio(i2s_read_buffer, bytes_read);
     // TODO: write data in file and save on sd card
+}
+
+void i2s_deinit()
+{
+    if (ESP_OK != i2s_channel_disable(i2s_rx_handle))
+    {
+        ESP_LOGE(TAG_I2S_HELPER, "Failed to disable I2S channel");
+        return;
+    }
+
+    if (ESP_OK != i2s_del_channel(i2s_rx_handle))
+    {
+        ESP_LOGE(TAG_I2S_HELPER, "Failed to delete I2S channel");
+        return;
+    }
 }
