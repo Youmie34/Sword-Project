@@ -3,6 +3,20 @@
 static const char *TAG_I2S_HELPER = "i2s_helper";
 static i2s_chan_handle_t i2s_rx_handle = NULL;
 
+i2s_std_config_t i2s_config = {
+    .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(I2S_SAMPLE_RATE),
+    .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_BIT_DEPTH, I2S_SLOT_MODE_MONO),
+    .gpio_cfg = {
+        .mclk = NC,
+        .bclk = I2S_SCK_PIN,
+        .ws = I2S_WS_PIN,
+        .dout = NC,
+        .din = I2S_DIN_PIN,
+        .invert_flags = {
+            .mclk_inv = 0,
+            .bclk_inv = 0,
+            .ws_inv = 0}}};
+
 void i2s_init()
 {
     // Create a new I2S RX channel
@@ -15,23 +29,31 @@ void i2s_init()
         return;
     }
 
-    // Reconfigure for PDM (correct for INMP441!)
-    i2s_pdm_rx_config_t pdm_rx_cfg = {
-        .clk_cfg = I2S_PDM_RX_CLK_DEFAULT_CONFIG(44100), // Or 48000
-        .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
-        .gpio_cfg = {
-            .din = I2S_DIN_PIN,
-            .clk = I2S_SCK_PIN,
-            .invert_flags = {
-                .clk_inv = true,
-            }},
-    };
+    // // Reconfigure for PDM (correct for INMP441!)
+    // i2s_pdm_rx_config_t pdm_rx_cfg = {
+    //     .clk_cfg = I2S_PDM_RX_CLK_DEFAULT_CONFIG(44100), // Or 48000
+    //     .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
+    //     .gpio_cfg = {
+    //         .din = I2S_DIN_PIN,
+    //         .clk = I2S_SCK_PIN,
+    //         .invert_flags = {
+    //             .clk_inv = true,
+    //         }},
+    // };
 
     // Initialize with PDM mode configuration
-    ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S PDM mode...");
-    if (ESP_OK != i2s_channel_init_pdm_rx_mode(i2s_rx_handle, &pdm_rx_cfg))
+    // ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S PDM mode...");
+    // if (ESP_OK != i2s_channel_init_pdm_rx_mode(i2s_rx_handle, &pdm_rx_cfg))
+    // {
+    //     ESP_LOGE(TAG_I2S_HELPER, "Failed to initialize I2S PDM mode");
+    //     return;
+    // }
+
+    // Initialize with std mode configuration
+    ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S std mode...");
+    if (ESP_OK != i2s_channel_init_std_mode(i2s_rx_handle, &i2s_config))
     {
-        ESP_LOGE(TAG_I2S_HELPER, "Failed to initialize I2S PDM mode");
+        ESP_LOGE(TAG_I2S_HELPER, "Failed to initialize I2S std mode");
         return;
     }
 
