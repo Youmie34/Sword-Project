@@ -2,12 +2,34 @@
 
 static const char *TAG_SD_MOUNT = "sd_mount";
 DIR *sd_dir = NULL;
+sdmmc_card_t *card = NULL;
 
-esp_vfs_fat_mount_config_t sd_mount_config = {
-    .format_if_mount_failed = false,
-    .max_files = 10,
-    .allocation_unit_size = 16 * 1024,
-};
+void mount_sd_card()
+{
+    esp_vfs_fat_mount_config_t sd_mount_config = {
+        .format_if_mount_failed = true,
+        .max_files = 10,
+        .allocation_unit_size = 16 * 1024,
+    };
+
+    esp_err_t ret = esp_vfs_fat_sdspi_mount(MOUNT_PATH, &sd_host, &slot_config, &sd_mount_config, &card);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG_SD_MOUNT, "Failed to mount SD card: %s", esp_err_to_name(ret));
+        return;
+    }
+    ESP_LOGI(TAG_SD_MOUNT, "SD card mounted successfully");
+}
+
+void unmount_sd_card()
+{
+    if (card != NULL)
+    {
+        esp_vfs_fat_sdcard_unmount(MOUNT_PATH, card);
+        card = NULL;
+    }
+    ESP_LOGI(TAG_SD_MOUNT, "Card unmounted");
+}
 
 void open_directory()
 {

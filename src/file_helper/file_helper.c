@@ -1,6 +1,7 @@
 #include "file_helper.h"
 
 static const char *TAG_FILE_HELPER = "file_helper";
+char full_path[30];
 
 TinyWavHeader header = {
     .ChunkID = {'R', 'I', 'F', 'F'},
@@ -28,7 +29,6 @@ TinyWav tw = {
 
 void create_file_on_sd(const char *filename)
 {
-    char full_path[30];
     snprintf(full_path, sizeof(full_path), "%s/%s", MOUNT_PATH, filename);
 
     FILE *file = fopen(full_path, "w");
@@ -56,15 +56,8 @@ void write_wav_data(const char *filename)
     }
 }
 
-void *create_data(void *data, size_t data_size)
+FILE *create_tinywave_file(const char *filename)
 {
-    // TODO: Implement data creation logic
-    return NULL;
-}
-
-void create_wave_file(const char *filename)
-{
-    char full_path[30];
     snprintf(full_path, sizeof(full_path), "%s/%s", MOUNT_PATH, filename);
 
     int err = tinywav_open_write(&tw,
@@ -75,13 +68,37 @@ void create_wave_file(const char *filename)
     if (err != 0)
     {
         ESP_LOGE(TAG_FILE_HELPER, "Failed to open wave file for writing: %s", full_path);
-        return;
+        return NULL;
     }
-    tw.h = header;            // Set the header for the TinyWav structure
-    write_wav_data(filename); // Write empty data to create the file
+
+    tw.h = header; // Set the header for the TinyWav structure
     tinywav_close_write(&tw);
 
     ESP_LOGI(TAG_FILE_HELPER, "Created wave file: %s", full_path);
+
+    return open_file(full_path);
+}
+
+void create_wave_file(const char *filename)
+{
+    // char full_path[30];
+    // snprintf(full_path, sizeof(full_path), "%s/%s", MOUNT_PATH, filename);
+
+    // FILE *file = fopen(full_path, "wb");
+    // if (file == NULL)
+    // {
+    //     ESP_LOGE(TAG_FILE_HELPER, "Failed to create file: %s", full_path);
+    //     return;
+    // }
+    // const wav_header_t wav_header =
+    //     WAV_HEADER_PCM_DEFAULT(flash_rec_time, 16, CONFIG_EXAMPLE_SAMPLE_RATE, 1);
+
+    // // Write the header to the WAV file
+    // fwrite(&wav_header, sizeof(wav_header), 1, file);
+
+    // i2s_record_data(file);
+
+    // ESP_LOGI(TAG_FILE_HELPER, "Created wave file: %s", full_path);
 }
 
 void create_test_files_on_sd(void)
@@ -91,6 +108,32 @@ void create_test_files_on_sd(void)
     for (uint8_t i = 1; i <= SAMPLE_AMOUNT; i++)
     {
         snprintf(filename, sizeof(filename), "test_%d.wav", i);
-        create_file_on_sd(filename);
+        record_wav(filename);
     }
+}
+
+void check_file_exists(const char *fullpath)
+{
+    struct stat stat_buffer;
+
+    if (stat(fullpath, &stat_buffer) == 0)
+    {
+        // Delete it if it exists
+        f_unlink(fullpath);
+        ESP_LOGI(TAG_FILE_HELPER, "File exists and has been deleted: %s", fullpath);
+    }
+}
+
+FILE *open_file(const char *full_path)
+{
+    FILE *file = fopen(full_path, "a");
+
+    if (file == NULL)
+    {
+        ESP_LOGE(TAG_FILE_HELPER, "Failed to open file: %s", full_path);
+        return NULL;
+    }
+
+    ESP_LOGI(TAG_FILE_HELPER, "Opened file: %s", full_path);
+    return file;
 }

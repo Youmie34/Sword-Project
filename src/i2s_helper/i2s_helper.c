@@ -46,30 +46,6 @@ void i2s_init()
     ESP_LOGI(TAG_I2S_HELPER, "I2S RX channel initialized successfully");
 }
 
-void input_data()
-{
-    // Static buffer for PDM mode (16-bit samples = 2 bytes per sample)
-    static uint8_t i2s_read_buffer[I2S_DMA_BUF_LEN * 2];
-    size_t bytes_read = 0;
-
-    if (i2s_rx_handle == NULL)
-    {
-        ESP_LOGE(TAG_I2S_HELPER, "I2S RX channel not initialized");
-        return;
-    }
-    // Read data from I2S using the new API
-    esp_err_t result = i2s_channel_read(i2s_rx_handle, i2s_read_buffer, sizeof(i2s_read_buffer), &bytes_read, TIMEOUT_MS);
-
-    if (result != ESP_OK)
-    {
-        ESP_LOGE(TAG_I2S_HELPER, "Failed to read data from I2S: %s", esp_err_to_name(result));
-        return;
-    }
-    //  Process the read data as needed
-    analyze_audio(i2s_read_buffer, bytes_read);
-    // TODO: write data in file and save on sd card
-}
-
 void i2s_deinit()
 {
     if (ESP_OK != i2s_channel_disable(i2s_rx_handle))
@@ -83,4 +59,31 @@ void i2s_deinit()
         ESP_LOGE(TAG_I2S_HELPER, "Failed to delete I2S channel");
         return;
     }
+}
+
+void i2s_record_data(FILE *file)
+{
+    int flash_wr_size = 0;
+
+    uint32_t flash_rec_time = BIT_RATE * RECORD_TIME;
+
+    size_t bytes_read = 0;
+    uint8_t i2s_readraw_buff[I2S_DMA_BUF_LEN * 4]; // Buffer for raw I2S data
+
+    while (flash_wr_size < flash_rec_time)
+    {
+        // Read the RAW samples from the microphone
+        if (i2s_channel_read(i2s_rx_handle, (char *)i2s_readraw_buff, sizeof(i2s_readraw_buff), &bytes_read, 1000) == ESP_OK)
+        {
+            // Write the samples to the WAV file
+            fwrite(i2s_readraw_buff, bytes_read, 1, file);
+            flash_wr_size += bytes_read;
+        }
+        else
+        {
+            ESP_LOGE(TAG_I2S_HELPER, "Failed to read data from I2S channel");
+            break;
+        }
+    }
+    ESP_LOGI(TAG_I2S_HELPER, "Recording done!");
 }

@@ -51,3 +51,19 @@ void analyze_audio(uint8_t *buffer, size_t len_bytes)
     ESP_LOGI(TAG_MIC_INMP441, "Avg: %.0f | Peak: %.1f%% | DC Off: %d | Min:%d Max:%d",
              avg_level, peak_percent, dc_offset, min_val, max_val);
 }
+
+void record_wav(const char *filename)
+{
+    // Use POSIX and C standard library functions to work with files.
+    ESP_LOGI(TAG_MIC_INMP441, "recording wav");
+
+    // First check if file exists before creating a new file.
+    // check_file_exists(filename);
+
+    FILE *file = create_tinywave_file(filename);
+
+    i2s_record_data(file);
+
+    fclose(file);
+    ESP_LOGI(TAG_MIC_INMP441, "File written on SDCard");
+}

@@ -6,23 +6,26 @@
 
 // static const char *TAG_MAIN = "main";
 
+void periph_init()
+{
+    init_spi();
+    init_sd_cs();
+    mount_sd_card();
+    i2s_init();
+}
+
+void deinit_periph()
+{
+    i2s_deinit();
+    unmount_sd_card();
+    deinit_spi();
+}
+
 void app_main(void)
 {
-    // ESP_LOGI(TAG_MAIN, "Initializing SPI");
+    periph_init();
 
-    // spi_bus_initialize(sd_host.slot, &sd_bus_cfg, SDSPI_DEFAULT_DMA);
-    // init_sd_cs();
+    create_test_files_on_sd();
 
-    // esp_vfs_fat_sdspi_mount(MOUNT_PATH, &sd_host, &slot_config, &sd_mount_config, NULL);
-    // ESP_LOGI(TAG_MAIN, "Finished Mounting SD");
-
-    // create_test_files_on_sd();
-    // list_files();
-
-    i2s_init();
-    while (1)
-    {
-        input_data();
-    }
-    i2s_deinit();
+    deinit_periph();
 }

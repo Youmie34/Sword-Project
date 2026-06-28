@@ -20,3 +20,24 @@ void init_sd_cs()
     slot_config.host_id = sd_host.slot;
     ESP_LOGI(TAG_SD_SPI, "SD card CS pin initialized");
 }
+
+void init_spi()
+{
+    esp_err_t ret = spi_bus_initialize(sd_host.slot, &sd_bus_cfg, SDSPI_DEFAULT_DMA);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG_SD_SPI, "Failed to initialize SPI bus: %s", esp_err_to_name(ret));
+        return;
+    }
+    ESP_LOGI(TAG_SD_SPI, "SPI bus initialized successfully");
+}
+
+void deinit_spi()
+{
+    if (ESP_OK != spi_bus_free(sd_host.slot))
+    {
+        ESP_LOGE(TAG_SD_SPI, "Failed to deinitialize SPI bus");
+        return;
+    }
+    ESP_LOGI(TAG_SD_SPI, "SPI bus deinitialized");
+}
