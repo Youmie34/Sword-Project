@@ -7,4 +7,7 @@
 
 #define NC -1
 #define TIMEOUT_MS 1000
+
+static const float LIMIT_THRESHOLD = 0.7f;
+
 #endif // COMMON_H

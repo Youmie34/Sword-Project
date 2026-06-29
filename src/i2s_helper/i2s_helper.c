@@ -91,9 +91,9 @@ void i2s_record_data()
             {
                 int32_t raw = ((int32_t *)i2s_readraw_buff)[i];
 
-                float new_conversion = (float)raw / 8388608.0f; // 24 bit
-
-                float_buff[i] = new_conversion;
+                float sample = (float)raw / 8388608.0f; // 24 bit
+                sample = apply_soft_limiter(sample);
+                float_buff[i] = sample;
             }
             // tinywav konvertiert float32 → int16 (wegen TW_INT16) automatisch
             tinywav_write_f(&tw, float_buff, num_samples);

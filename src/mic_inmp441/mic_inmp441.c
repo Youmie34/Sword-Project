@@ -66,3 +66,21 @@ void record_wav(const char *filename)
 
     ESP_LOGI(TAG_MIC_INMP441, "File written on SDCard");
 }
+
+float apply_soft_limiter(float sample)
+{
+    float abs_s = fabsf(sample);
+    if (abs_s > LIMIT_THRESHOLD)
+    {
+        // Sanfte Kompression: quadratische Kurve oberhalb Threshold
+        float sign = (sample >= 0) ? 1.0f : -1.0f;
+        float excess = abs_s - LIMIT_THRESHOLD;
+        sample = sign * (LIMIT_THRESHOLD + excess * 0.3f);
+        // Hartes Clippen bei 0.95 verhindern
+        if (fabsf(sample) > 0.95f)
+        {
+            sample = sign * 0.95f;
+        }
+    }
+    return sample;
+}
