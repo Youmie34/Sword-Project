@@ -103,14 +103,6 @@ void i2s_record_data()
             // // int32 I2S → float32 [-1.0, 1.0]
             int num_samples = bytes_read / sizeof(int32_t);
 
-            int max_frames = bytes_read / sizeof(int16_t);
-            ESP_LOGI(TAG_I2S_HELPER, "Max frames this buffer: %d vs allocated: %d",
-                     max_frames, I2S_DMA_BUF_LEN * 2 / sizeof(int16_t));
-            if (max_frames > I2S_DMA_BUF_LEN * 2 / sizeof(int16_t))
-            {
-                ESP_LOGE(TAG_I2S_HELPER, "BUFFER OVERFLOW RISK!");
-            }
-
             for (int i = 0; i < num_samples; i++)
             {
                 int16_t raw = ((int16_t *)i2s_readraw_buff)[i];

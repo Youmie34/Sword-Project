@@ -7,10 +7,14 @@ sdmmc_card_t *card = NULL;
 void mount_sd_card()
 {
     esp_vfs_fat_mount_config_t sd_mount_config = {
-        .format_if_mount_failed = true,
+        .format_if_mount_failed = false,
         .max_files = 10,
         .allocation_unit_size = 16 * 1024,
     };
+
+    // DEBUG
+    ESP_LOGI(TAG_SD_MOUNT, "Before SD mount - checking SPI bus status");
+    ESP_LOGI(TAG_SD_MOUNT, "SPI Host: %d, DMA Channel: %d", sd_host.slot, SDSPI_DEFAULT_DMA);
 
     esp_err_t ret = esp_vfs_fat_sdspi_mount(MOUNT_PATH, &sd_host, &slot_config, &sd_mount_config, &card);
     if (ret != ESP_OK)
@@ -18,7 +22,17 @@ void mount_sd_card()
         ESP_LOGE(TAG_SD_MOUNT, "Failed to mount SD card: %s", esp_err_to_name(ret));
         return;
     }
-    ESP_LOGI(TAG_SD_MOUNT, "SD card mounted successfully");
+
+    // DEBUG
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG_SD_MOUNT, "Mount failed: %s (code: 0x%x)",
+                 esp_err_to_name(ret), ret);
+    }
+    else
+    {
+        ESP_LOGI(TAG_SD_MOUNT, "SUCCESS: Card mounted at %s", MOUNT_PATH);
+    }
 }
 
 void unmount_sd_card()
