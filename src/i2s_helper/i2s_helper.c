@@ -84,18 +84,6 @@ void i2s_record_data()
         // Read the RAW samples from the microphone
         if (i2s_channel_read(i2s_rx_handle, (char *)i2s_readraw_buff, sizeof(i2s_readraw_buff), &bytes_read, 1000) == ESP_OK)
         {
-            // Nach i2s_channel_read(), vor der Konvertierung:
-            static int counter = 0;
-            if (++counter % 50 == 0)
-            { // Alle 50 Durchläufe
-                uint8_t *buf = i2s_readraw_buff;
-                int32_t sample0 = *(int32_t *)&buf[0];
-                int32_t sample1 = *(int32_t *)&buf[4];
-
-                // ESP_LOGI(TAG_I2S_HELPER, "Raw samples: [%08X] [%08X] -> Dec: [%ld] [%ld]",
-                //          (unsigned int)sample0, (unsigned int)sample1, (long)sample0, (long)sample1);
-            }
-
             // // int32 I2S → float32 [-1.0, 1.0]
             int num_samples = bytes_read / sizeof(int32_t);
 
@@ -103,12 +91,7 @@ void i2s_record_data()
             {
                 int32_t raw = ((int32_t *)i2s_readraw_buff)[i];
 
-                // Debug: Vergleiche alt vs neu
-                float old_conversion = raw * (1.0f / 32768.0f); // WAS DU JETZT MACHST
-                float new_conversion = (float)raw / 8388608.0f; // WAS ES SEIN SOLLTE
-
-                ESP_LOGI(TAG_I2S_HELPER, "Raw: %08X | Old: %.3f | New: %.3f",
-                         (unsigned int)raw, old_conversion, new_conversion);
+                float new_conversion = (float)raw / 8388608.0f; // 24 bit
 
                 float_buff[i] = new_conversion;
             }
