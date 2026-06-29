@@ -23,7 +23,7 @@ void init_sd_cs()
 
 void init_spi()
 {
-    esp_err_t ret = spi_bus_initialize(sd_host.slot, &sd_bus_cfg, SDSPI_DEFAULT_DMA);
+    esp_err_t ret = spi_bus_initialize(sd_host.slot, &sd_bus_cfg, SPI_DMA_CH_AUTO);
     if (ret != ESP_OK)
     {
         ESP_LOGE(TAG_SD_SPI, "Failed to initialize SPI bus: %s", esp_err_to_name(ret));
