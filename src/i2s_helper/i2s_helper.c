@@ -5,7 +5,9 @@ static i2s_chan_handle_t i2s_rx_handle = NULL;
 
 i2s_std_config_t i2s_config = {
     .clk_cfg = I2S_STD_CLK_DEFAULT_CONFIG(I2S_SAMPLE_RATE),
-    .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_BIT_DEPTH, I2S_SLOT_MODE_MONO),
+    .slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(
+        I2S_DATA_BIT_WIDTH_32BIT,
+        I2S_SLOT_MODE_MONO),
     .gpio_cfg = {
         .mclk = NC,
         .bclk = I2S_SCK_PIN,
@@ -19,6 +21,8 @@ i2s_std_config_t i2s_config = {
 
 void i2s_init()
 {
+    i2s_config.slot_cfg.slot_mask = I2S_STD_SLOT_LEFT; // Only use left channel for mono
+
     // Create a new I2S RX channel
     i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
 
@@ -28,26 +32,6 @@ void i2s_init()
         ESP_LOGE(TAG_I2S_HELPER, "Failed to create I2S channel");
         return;
     }
-
-    // // Reconfigure for PDM (correct for INMP441!)
-    // i2s_pdm_rx_config_t pdm_rx_cfg = {
-    //     .clk_cfg = I2S_PDM_RX_CLK_DEFAULT_CONFIG(44100), // Or 48000
-    //     .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
-    //     .gpio_cfg = {
-    //         .din = I2S_DIN_PIN,
-    //         .clk = I2S_SCK_PIN,
-    //         .invert_flags = {
-    //             .clk_inv = true,
-    //         }},
-    // };
-
-    // Initialize with PDM mode configuration
-    // ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S PDM mode...");
-    // if (ESP_OK != i2s_channel_init_pdm_rx_mode(i2s_rx_handle, &pdm_rx_cfg))
-    // {
-    //     ESP_LOGE(TAG_I2S_HELPER, "Failed to initialize I2S PDM mode");
-    //     return;
-    // }
 
     // Initialize with std mode configuration
     ESP_LOGI(TAG_I2S_HELPER, "Initializing I2S std mode...");
@@ -100,13 +84,33 @@ void i2s_record_data()
         // Read the RAW samples from the microphone
         if (i2s_channel_read(i2s_rx_handle, (char *)i2s_readraw_buff, sizeof(i2s_readraw_buff), &bytes_read, 1000) == ESP_OK)
         {
+            // Nach i2s_channel_read(), vor der Konvertierung:
+            static int counter = 0;
+            if (++counter % 50 == 0)
+            { // Alle 50 Durchläufe
+                uint8_t *buf = i2s_readraw_buff;
+                int32_t sample0 = *(int32_t *)&buf[0];
+                int32_t sample1 = *(int32_t *)&buf[4];
+
+                // ESP_LOGI(TAG_I2S_HELPER, "Raw samples: [%08X] [%08X] -> Dec: [%ld] [%ld]",
+                //          (unsigned int)sample0, (unsigned int)sample1, (long)sample0, (long)sample1);
+            }
+
             // // int32 I2S → float32 [-1.0, 1.0]
             int num_samples = bytes_read / sizeof(int32_t);
 
             for (int i = 0; i < num_samples; i++)
             {
-                int16_t raw = ((int16_t *)i2s_readraw_buff)[i];
-                float_buff[i] = raw * (1.0f / 32768.0f); // Multiplikation schneller als Division
+                int32_t raw = ((int32_t *)i2s_readraw_buff)[i];
+
+                // Debug: Vergleiche alt vs neu
+                float old_conversion = raw * (1.0f / 32768.0f); // WAS DU JETZT MACHST
+                float new_conversion = (float)raw / 8388608.0f; // WAS ES SEIN SOLLTE
+
+                ESP_LOGI(TAG_I2S_HELPER, "Raw: %08X | Old: %.3f | New: %.3f",
+                         (unsigned int)raw, old_conversion, new_conversion);
+
+                float_buff[i] = new_conversion;
             }
             // tinywav konvertiert float32 → int16 (wegen TW_INT16) automatisch
             tinywav_write_f(&tw, float_buff, num_samples);

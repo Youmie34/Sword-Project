@@ -9,7 +9,6 @@
 #include "../common/common.h"
 #include "../file_helper/file_helper.h"
 
-void analyze_audio(uint8_t *buffer, size_t len_bytes);
 void record_wav(const char *filename);
 
 #endif // MIC_INMP441_H

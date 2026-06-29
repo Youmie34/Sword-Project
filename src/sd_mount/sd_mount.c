@@ -12,10 +12,6 @@ void mount_sd_card()
         .allocation_unit_size = 16 * 1024,
     };
 
-    // DEBUG
-    ESP_LOGI(TAG_SD_MOUNT, "Before SD mount - checking SPI bus status");
-    ESP_LOGI(TAG_SD_MOUNT, "SPI Host: %d, DMA Channel: %d", sd_host.slot, SDSPI_DEFAULT_DMA);
-
     esp_err_t ret = esp_vfs_fat_sdspi_mount(MOUNT_PATH, &sd_host, &slot_config, &sd_mount_config, &card);
     if (ret != ESP_OK)
     {

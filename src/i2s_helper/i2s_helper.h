@@ -6,6 +6,7 @@
 #include "driver/i2s_pdm.h"
 #include "driver/i2s_tdm.h"
 #include "../common/common.h"
+#include <inttypes.h>
 #include "../mic_inmp441/mic_inmp441.h"
 
 #define I2S_SAMPLE_RATE 44100
