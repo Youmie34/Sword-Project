@@ -4,7 +4,6 @@
 #include "../sd_mount/sd_mount.h"
 #include "../common/common.h"
 #include "../../include/tinywav/tinywav.h"
-#include "../../include/format_wav/format_wav.h"
 #include <sys/stat.h>
 #include "i2s_helper/i2s_helper.h"
 
@@ -18,12 +17,7 @@
 extern TinyWav tw;
 extern char full_path[30];
 
-void create_file_on_sd(const char *filename);
 void create_tinywave_file(const char *filename);
-void create_wave_file(const char *filename);
 void create_test_files_on_sd(void);
-void write_wav_data(const char *filename);
-void check_file_exists(const char *filename);
-FILE *open_file(const char *filename);
 
 #endif // FILE_HELPER_H

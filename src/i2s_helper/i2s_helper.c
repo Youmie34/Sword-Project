@@ -23,7 +23,6 @@ void i2s_init()
 {
     i2s_config.slot_cfg.slot_mask = I2S_STD_SLOT_LEFT; // Only use left channel for mono
 
-    // Create a new I2S RX channel
     i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_AUTO, I2S_ROLE_MASTER);
 
     ESP_LOGI(TAG_I2S_HELPER, "Creating I2S channel...");
@@ -84,20 +83,18 @@ void i2s_record_data()
         // Read the RAW samples from the microphone
         if (i2s_channel_read(i2s_rx_handle, (char *)i2s_readraw_buff, sizeof(i2s_readraw_buff), &bytes_read, 1000) == ESP_OK)
         {
-            // // int32 I2S → float32 [-1.0, 1.0]
             int num_samples = bytes_read / sizeof(int32_t);
 
             for (int i = 0; i < num_samples; i++)
             {
                 int32_t raw = ((int32_t *)i2s_readraw_buff)[i];
 
-                float sample = (float)raw / 8388608.0f; // 24 bit
+                float sample = (float)raw / 8388608.0f; // for 24 bit
                 sample = apply_soft_limiter(sample);
                 float_buff[i] = sample;
             }
-            // tinywav konvertiert float32 → int16 (wegen TW_INT16) automatisch
             tinywav_write_f(&tw, float_buff, num_samples);
-            flash_wr_size += num_samples * sizeof(int16_t); // int16 im File!
+            flash_wr_size += num_samples * sizeof(int16_t);
         }
         else
         {
