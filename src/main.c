@@ -1,19 +1,29 @@
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "driver/gpio.h"
-#include "sdkconfig.h"
+#include "file_helper/file_helper.h"
+#include "i2s_helper/i2s_helper.h"
+#include "common/common.h"
+#include "sd_spi/sd_spi.h"
+#include "sd_mount/sd_mount.h"
 
-#define GPIO_LED 19 // port pin of on - board LED
-
-void app_main()
+void periph_init()
 {
-    gpio_set_direction(GPIO_LED, GPIO_MODE_OUTPUT); // set GPIO as output
+    init_spi();
+    init_sd_cs();
+    mount_sd_card();
+    i2s_init();
+}
 
-    while (1)
-    {
-        gpio_set_level(GPIO_LED, 0);           // set GPIO low , LED goes on
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // wait 100 ms
-        gpio_set_level(GPIO_LED, 1);           // set GPIO high , LED goes off
-        vTaskDelay(1000 / portTICK_PERIOD_MS); // wait 100 ms
-    }
+void deinit_periph()
+{
+    i2s_deinit();
+    unmount_sd_card();
+    deinit_spi();
+}
+
+void app_main(void)
+{
+    periph_init();
+
+    create_test_files_on_sd();
+    list_files();
+    deinit_periph();
 }
