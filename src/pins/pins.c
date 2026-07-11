@@ -1,6 +1,6 @@
 #include "pins.h"
 
-volatile bool input = false;
+volatile bool flag_input = false;
 
 void init_pins()
 {
@@ -13,11 +13,11 @@ void check_input()
     if (gpio_get_level(input_pin) == 1)
     {
         // gpio_set_level(LED_PIN, 1);
-        input = true;
+        flag_input = true;
     }
     else
     {
         // gpio_set_level(LED_PIN, 0);
-        input = false;
+        flag_input = false;
     }
 }

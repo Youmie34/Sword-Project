@@ -7,7 +7,7 @@
 #define LED_PIN 3
 #define input_pin 17
 
-extern volatile bool input;
+extern volatile bool flag_input;
 
 void init_pins();
 void check_input();
