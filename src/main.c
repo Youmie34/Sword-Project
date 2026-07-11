@@ -3,9 +3,11 @@
 #include "common/common.h"
 #include "sd_spi/sd_spi.h"
 #include "sd_mount/sd_mount.h"
+#include "pins/pins.h"
 
 void periph_init()
 {
+    init_pins();
     init_spi();
     init_sd_cs();
     mount_sd_card();
@@ -22,7 +24,6 @@ void deinit_periph()
 void app_main(void)
 {
     periph_init();
-
     create_test_files_on_sd();
     list_files();
     deinit_periph();
