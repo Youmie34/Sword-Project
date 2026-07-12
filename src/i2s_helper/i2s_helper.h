@@ -7,6 +7,7 @@
 #include "driver/i2s_tdm.h"
 #include "../common/common.h"
 #include "../mic_inmp441/mic_inmp441.h"
+#include "pins/pins.h"
 
 #define I2S_SAMPLE_RATE 44100
 #define I2S_BIT_DEPTH 32
@@ -22,5 +23,6 @@ extern i2s_std_config_t i2s_config;
 void i2s_init();
 void i2s_deinit();
 void i2s_record_data();
+void i2s_record_data_while_input_high();
 
 #endif // I2S_HELPER_H

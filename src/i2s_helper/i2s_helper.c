@@ -68,8 +68,7 @@ void i2s_deinit()
 
 void i2s_record_data()
 {
-
-    ESP_LOGI(TAG_I2S_HELPER, "Starting recording");
+    ESP_LOGI(TAG_I2S_HELPER, "Starting fixed-time recording");
     int flash_wr_size = 0;
 
     uint32_t flash_rec_time = BIT_RATE * RECORD_TIME;
@@ -80,7 +79,6 @@ void i2s_record_data()
 
     while (flash_wr_size < flash_rec_time)
     {
-        // Read the RAW samples from the microphone
         if (i2s_channel_read(i2s_rx_handle, (char *)i2s_readraw_buff, sizeof(i2s_readraw_buff), &bytes_read, 1000) == ESP_OK)
         {
             int num_samples = bytes_read / sizeof(int32_t);
@@ -105,4 +103,45 @@ void i2s_record_data()
 
     tinywav_close_write(&tw);
     ESP_LOGI(TAG_I2S_HELPER, "Recording done!");
+}
+
+void i2s_record_data_while_input_high()
+{
+    ESP_LOGI(TAG_I2S_HELPER, "Starting input-driven recording");
+
+    size_t bytes_read = 0;
+    static uint8_t i2s_readraw_buff[I2S_DMA_BUF_LEN * 2];           // Buffer for raw I2S data
+    static float float_buff[I2S_DMA_BUF_LEN * 2 / sizeof(int32_t)]; // Buffer for float samples
+
+    while (true)
+    {
+        check_input();
+        if (!flag_input)
+        {
+            break;
+        }
+
+        if (i2s_channel_read(i2s_rx_handle, (char *)i2s_readraw_buff, sizeof(i2s_readraw_buff), &bytes_read, 1000) == ESP_OK)
+        {
+            int num_samples = bytes_read / sizeof(int32_t);
+
+            for (int i = 0; i < num_samples; i++)
+            {
+                int32_t raw = ((int32_t *)i2s_readraw_buff)[i];
+
+                float sample = (float)raw / 8388608.0f; // for 24 bit
+                sample = apply_soft_limiter(sample);
+                float_buff[i] = sample;
+            }
+            tinywav_write_f(&tw, float_buff, num_samples);
+        }
+        else
+        {
+            ESP_LOGE(TAG_I2S_HELPER, "Failed to read data from I2S channel");
+            break;
+        }
+    }
+
+    tinywav_close_write(&tw);
+    ESP_LOGI(TAG_I2S_HELPER, "Input released, recording saved");
 }

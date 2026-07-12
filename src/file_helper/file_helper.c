@@ -2,7 +2,7 @@
 
 static const char *TAG_FILE_HELPER = "file_helper";
 TinyWav tw;
-char full_path[30];
+char full_path[64];
 
 void create_tinywave_file(const char *filename)
 {
