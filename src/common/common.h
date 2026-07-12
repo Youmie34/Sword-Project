@@ -4,6 +4,8 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdint.h>
 
 #define NC -1
 #define TIMEOUT_MS 1000

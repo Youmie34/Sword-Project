@@ -3,7 +3,7 @@
 
 #include "../sd_mount/sd_mount.h"
 #include "../common/common.h"
-#include "../../include/tinywav/tinywav.h"
+#include "tinywav/tinywav.h"
 #include <sys/stat.h>
 #include "i2s_helper/i2s_helper.h"
 
