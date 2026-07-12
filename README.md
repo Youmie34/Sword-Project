@@ -6,6 +6,7 @@
 
 - ESP-IDF: https://github.com/espressif/esp-idf/tree/v4.3
 - Tinywav: https://github.com/mhroth/tinywav/tree/master
+- Edge Impulse: https://github.com/edgeimpulse/firmware-espressif-esp32
 
 # Disclaimer
 
