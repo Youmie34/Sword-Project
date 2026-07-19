@@ -12,7 +12,7 @@ typedef struct
 
 typedef struct
 {
-    color_t *color;
+    color_t color[20]; // Array of colors in the theme
 
 } color_theme_t;
 
@@ -24,5 +24,10 @@ extern const color_t color_orange;
 extern const color_t color_yellow;
 
 extern const color_t color_off;
+
+extern const color_theme_t theme_fire;
+extern const color_theme_t theme_thunder;
+extern const color_theme_t theme_light;
+extern const color_theme_t theme_wind;
 
 #endif // COLORS_H

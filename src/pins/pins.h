@@ -6,6 +6,7 @@
 
 #define LED_PIN 3
 #define input_pin 17
+#define NEO_DIN 0
 
 extern volatile bool flag_input;
 

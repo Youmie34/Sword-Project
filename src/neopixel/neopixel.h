@@ -9,5 +9,6 @@ extern led_strip_rmt_config_t rmt_config;
 extern led_strip_handle_t led_strip;
 
 void init_neopixel();
+void test_neo();
 
 #endif // NEOPIXEL_H

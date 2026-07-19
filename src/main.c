@@ -30,4 +30,5 @@ void deinit_periph()
 void app_main(void)
 {
     init_neopixel();
+    test_neo();
 }
