@@ -15,7 +15,7 @@
 #ifndef _dsps_fft2r_H_
 #define _dsps_fft2r_H_
 
-#include "dsp_err.h"
+#include "../../common/include/dsp_err.h"
 #include "sdkconfig.h"
 #include "dsps_fft_tables.h"
 #include "dsps_fft2r_platform.h"
