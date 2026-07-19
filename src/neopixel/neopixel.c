@@ -6,7 +6,7 @@
 /// LED strip common configuration
 led_strip_config_t strip_config = {
     .strip_gpio_num = BLINK_GPIO,                                // The GPIO that connected to the LED strip's data line
-    .max_leds = 1,                                               // The number of LEDs in the strip,
+    .max_leds = 10,                                              // The number of LEDs in the strip,
     .led_model = LED_MODEL_WS2812,                               // LED strip model, it determines the bit timing
     .color_component_format = LED_STRIP_COLOR_COMPONENT_FMT_GRB, // The color component format is G-R-B
     .flags = {
