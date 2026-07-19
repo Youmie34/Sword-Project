@@ -1,6 +1,9 @@
 #include "neopixel.h"
 #include "../pins/pins.h"
 
+static const char *TAG_NEOPIXEL = "neopixel";
+float brightness_corrected = powf(BRIGHTNESS / 255.0f, 2.8f); // normalize and use gamma correction for brightness adjustment
+
 /// LED strip common configuration
 led_strip_config_t strip_config = {
     .strip_gpio_num = NEO_DIN,                                   // The GPIO that connected to the LED strip's data line
@@ -25,30 +28,47 @@ led_strip_handle_t led_strip = NULL;
 
 void init_neopixel()
 {
-    ESP_LOGI("NEOPIXEL", "Initializing Neopixel...");
+    ESP_LOGI(TAG_NEOPIXEL, "Initializing Neopixel...");
 
     ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config, &led_strip));
     led_strip_clear(led_strip);
 
-    ESP_LOGI("NEOPIXEL", "Neopixel initialized successfully.");
+    ESP_LOGI(TAG_NEOPIXEL, "Neopixel initialized successfully.");
 }
 
-void test_neo()
+color_t apply_brightness(color_t color)
 {
-    if (led_strip == NULL)
-    {
-        ESP_LOGE("NEOPIXEL", "LED strip is not initialized");
-        return;
-    }
+    color_t adjusted = {
+        .red = (uint8_t)(color.red * brightness_corrected),
+        .green = (uint8_t)(color.green * brightness_corrected),
+        .blue = (uint8_t)(color.blue * brightness_corrected),
+    };
+    return adjusted;
+}
 
-    ESP_LOGI("NEOPIXEL", "Lighting up the neopixels...");
+void show_neopixel(led_strip_handle_t led_strip, color_t color)
+{
+    ESP_LOGI(TAG_NEOPIXEL, "Lighting up the neopixels...");
 
     led_strip_clear(led_strip);
 
     for (uint32_t i = 0; i < strip_config.max_leds; i++)
     {
-        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, 0, 255, 0));
+        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, color.red, color.green, color.blue));
     }
-
     ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+}
+
+void wipe_neopixel(led_strip_handle_t led_strip, color_t color)
+{
+    // ESP_LOGI(TAG_NEOPIXEL, "Lighting up the neopixels...");
+
+    color_t dimmed = apply_brightness(color);
+
+    for (int i = 0; i < strip_config.max_leds; i++)
+    {
+        ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, dimmed.red, dimmed.green, dimmed.blue));
+        ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+        vTaskDelay(pdMS_TO_TICKS(30));
+    }
 }

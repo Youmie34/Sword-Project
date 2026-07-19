@@ -5,8 +5,6 @@
 #include "sd_spi/sd_spi.h"
 #include "sd_mount/sd_mount.h"
 #include "pins/pins.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "neopixel/neopixel.h"
 
 // static const char *TAG_MAIN = "main";
@@ -30,5 +28,11 @@ void deinit_periph()
 void app_main(void)
 {
     init_neopixel();
-    test_neo();
+
+    while (1)
+    {
+        wipe_neopixel(led_strip, color_yellow);
+        wipe_neopixel(led_strip, color_blue);
+        wipe_neopixel(led_strip, color_red);
+    }
 }
