@@ -1,6 +1,6 @@
 # Sword-Project 🗡️✨
 
-![](Wireframe/design_references/miracle_sword%20(1).jpg)
+<img src="Wireframe/design_references/miracle_sword%20(1).jpg" width="50%" />
 
 ## Sources
 
