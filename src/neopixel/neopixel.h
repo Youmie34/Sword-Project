@@ -16,5 +16,6 @@ void init_neopixel();
 color_t apply_brightness(color_t color);
 void show_neopixel(led_strip_handle_t led_strip, color_t color);
 void wipe_neopixel(led_strip_handle_t led_strip, color_t color);
+void theater_chase_neopixel(led_strip_handle_t led_strip, color_t color);
 
 #endif // NEOPIXEL_H

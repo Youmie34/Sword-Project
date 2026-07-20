@@ -31,8 +31,8 @@ void app_main(void)
 
     while (1)
     {
-        wipe_neopixel(led_strip, color_yellow);
-        wipe_neopixel(led_strip, color_blue);
-        wipe_neopixel(led_strip, color_red);
+        theater_chase_neopixel(led_strip, color_red);
+        theater_chase_neopixel(led_strip, color_green);
+        theater_chase_neopixel(led_strip, color_blue);
     }
 }

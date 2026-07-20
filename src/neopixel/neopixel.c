@@ -2,7 +2,7 @@
 #include "../pins/pins.h"
 
 static const char *TAG_NEOPIXEL = "neopixel";
-float brightness_corrected = powf(BRIGHTNESS / 255.0f, 2.8f); // normalize and use gamma correction for brightness adjustment
+float brightness_corrected;
 
 /// LED strip common configuration
 led_strip_config_t strip_config = {
@@ -32,7 +32,7 @@ void init_neopixel()
 
     ESP_ERROR_CHECK(led_strip_new_rmt_device(&strip_config, &rmt_config, &led_strip));
     led_strip_clear(led_strip);
-
+    brightness_corrected = powf(BRIGHTNESS / 255.0f, 2.8f); // normalize and use gamma correction for brightness adjustment
     ESP_LOGI(TAG_NEOPIXEL, "Neopixel initialized successfully.");
 }
 
@@ -70,5 +70,30 @@ void wipe_neopixel(led_strip_handle_t led_strip, color_t color)
         ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, dimmed.red, dimmed.green, dimmed.blue));
         ESP_ERROR_CHECK(led_strip_refresh(led_strip));
         vTaskDelay(pdMS_TO_TICKS(30));
+    }
+}
+
+void theater_chase_neopixel(led_strip_handle_t led_strip, color_t color)
+{
+    ESP_LOGI(TAG_NEOPIXEL, "Starting theater chase effect...");
+
+    color_t dimmed = apply_brightness(color);
+
+    for (int j = 0; j < 10; j++) // Repeat the chase effect 10 times
+    {
+        for (int q = 0; q < 3; q++)
+        {
+            for (int i = 0; i < strip_config.max_leds; i += 3)
+            {
+                ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i + q, dimmed.red, dimmed.green, dimmed.blue));
+            }
+            ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+            vTaskDelay(pdMS_TO_TICKS(100));
+
+            for (int i = 0; i < strip_config.max_leds; i += 3)
+            {
+                ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i + q, 0, 0, 0)); // Turn off the pixel
+            }
+        }
     }
 }
