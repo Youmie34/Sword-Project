@@ -46,6 +46,18 @@ color_t apply_brightness(color_t color)
     return adjusted;
 }
 
+color_t apply_brightness_custom(color_t color, int brightness)
+{
+    float brightness_factor = powf((float)brightness / 255.0f, 2.8f); // normalize and use gamma correction for brightness adjustment
+
+    color_t adjusted = {
+        .red = (uint8_t)(color.red * brightness_factor),
+        .green = (uint8_t)(color.green * brightness_factor),
+        .blue = (uint8_t)(color.blue * brightness_factor),
+    };
+    return adjusted;
+}
+
 void show_neopixel(led_strip_handle_t led_strip, color_t color)
 {
     ESP_LOGI(TAG_NEOPIXEL, "Lighting up the neopixels...");
@@ -95,5 +107,42 @@ void theater_chase_neopixel(led_strip_handle_t led_strip, color_t color)
                 ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i + q, 0, 0, 0)); // Turn off the pixel
             }
         }
+    }
+}
+
+void glow_neopixel(led_strip_handle_t led_strip, color_t color, uint8_t delay_ms)
+{
+    ESP_LOGI(TAG_NEOPIXEL, "Starting glow effect...");
+
+    for (int brightness = 0; brightness <= 255; brightness += 5)
+    {
+        color_t adjusted_color = {
+            .red = (uint8_t)(color.red * (brightness / 255.0f)),
+            .green = (uint8_t)(color.green * (brightness / 255.0f)),
+            .blue = (uint8_t)(color.blue * (brightness / 255.0f)),
+        };
+
+        for (uint32_t i = 0; i < strip_config.max_leds; i++)
+        {
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, adjusted_color.red, adjusted_color.green, adjusted_color.blue));
+        }
+        ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+        vTaskDelay(pdMS_TO_TICKS(delay_ms));
+    }
+
+    for (int brightness = 255; brightness >= 0; brightness -= 5)
+    {
+        color_t adjusted_color = {
+            .red = (uint8_t)(color.red * (brightness / 255.0f)),
+            .green = (uint8_t)(color.green * (brightness / 255.0f)),
+            .blue = (uint8_t)(color.blue * (brightness / 255.0f)),
+        };
+
+        for (uint32_t i = 0; i < strip_config.max_leds; i++)
+        {
+            ESP_ERROR_CHECK(led_strip_set_pixel(led_strip, i, adjusted_color.red, adjusted_color.green, adjusted_color.blue));
+        }
+        ESP_ERROR_CHECK(led_strip_refresh(led_strip));
+        vTaskDelay(pdMS_TO_TICKS(delay_ms));
     }
 }

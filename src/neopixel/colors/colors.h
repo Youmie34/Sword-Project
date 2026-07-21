@@ -20,8 +20,12 @@ extern const color_t color_red;
 extern const color_t color_green;
 extern const color_t color_blue;
 extern const color_t color_violet;
+extern const color_t color_magenta;
 extern const color_t color_orange;
 extern const color_t color_yellow;
+extern const color_t color_lavender;
+extern const color_t color_indigo;
+extern const color_t color_cyan;
 
 extern const color_t color_off;
 
