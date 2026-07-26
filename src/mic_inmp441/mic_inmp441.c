@@ -8,7 +8,7 @@ void record_wav(const char *filename)
 
     create_tinywave_file(filename);
 
-    i2s_record_data();
+    i2s_record_data_while_input_high();
 
     ESP_LOGI(TAG_MIC_INMP441, "File written on SDCard");
 }

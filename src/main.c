@@ -1,11 +1,17 @@
 #include "file_helper/file_helper.h"
 #include "i2s_helper/i2s_helper.h"
+#include "mic_inmp441/mic_inmp441.h"
 #include "common/common.h"
 #include "sd_spi/sd_spi.h"
 #include "sd_mount/sd_mount.h"
+#include "pins/pins.h"
+#include "neopixel/neopixel.h"
+
+// static const char *TAG_MAIN = "main";
 
 void periph_init()
 {
+    init_pins();
     init_spi();
     init_sd_cs();
     mount_sd_card();
@@ -21,9 +27,12 @@ void deinit_periph()
 
 void app_main(void)
 {
-    periph_init();
+    init_neopixel();
 
-    create_test_files_on_sd();
-    list_files();
-    deinit_periph();
+    while (1)
+    {
+        glow_neopixel(led_strip, color_yellow, 20);
+        glow_neopixel(led_strip, color_lavender, 20);
+        glow_neopixel(led_strip, color_magenta, 20);
+    }
 }

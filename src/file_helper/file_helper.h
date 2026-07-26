@@ -15,7 +15,7 @@
 #define BIT_RATE (SAMPLE_RATE * NUM_CHANNELS * SAMPLING_RATE / 8)
 
 extern TinyWav tw;
-extern char full_path[30];
+extern char full_path[64];
 
 void create_tinywave_file(const char *filename);
 void create_test_files_on_sd(void);
