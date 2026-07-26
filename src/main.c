@@ -7,17 +7,18 @@
 #include "pins/pins.h"
 #include "neopixel/neopixel.h"
 #include "i2c_helper/i2c_helper.h"
+#include "lis3dsh/lis3dsh.h"
 
 // static const char *TAG_MAIN = "main";
 
 void periph_init()
 {
-    init_i2c();
+    i2c_master_init();
 }
 
 void deinit_periph()
 {
-    deinit_i2c();
+    i2c_deinit();
 }
 
 void app_main(void)
