@@ -6,33 +6,20 @@
 #include "sd_mount/sd_mount.h"
 #include "pins/pins.h"
 #include "neopixel/neopixel.h"
+#include "i2c_helper/i2c_helper.h"
 
 // static const char *TAG_MAIN = "main";
 
 void periph_init()
 {
-    init_pins();
-    init_spi();
-    init_sd_cs();
-    mount_sd_card();
-    i2s_init();
+    init_i2c();
 }
 
 void deinit_periph()
 {
-    i2s_deinit();
-    unmount_sd_card();
-    deinit_spi();
+    deinit_i2c();
 }
 
 void app_main(void)
 {
-    init_neopixel();
-
-    while (1)
-    {
-        glow_neopixel(led_strip, color_yellow, 20);
-        glow_neopixel(led_strip, color_lavender, 20);
-        glow_neopixel(led_strip, color_magenta, 20);
-    }
 }

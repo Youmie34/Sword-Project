@@ -6,6 +6,7 @@
 #include "../../include/tinywav/tinywav.h"
 #include <sys/stat.h>
 #include "i2s_helper/i2s_helper.h"
+#include "../pins/pins.h"
 
 #define SAMPLE_AMOUNT 5
 #define NUM_CHANNELS 1    // (mono)

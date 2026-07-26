@@ -5,11 +5,7 @@
 #include "driver/gpio.h"
 #include "sdmmc_cmd.h"
 #include "../common/common.h"
-
-#define SD_MISO 7
-#define SD_MOSI 6
-#define SD_CLK 5
-#define SD_CS 4
+#include "../pins/pins.h"
 
 extern sdmmc_host_t sd_host;
 extern sdspi_device_config_t slot_config;
